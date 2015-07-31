@@ -78,7 +78,27 @@ object List { // `List` companion object. Contains functions for creating and wo
 
   def length[A](l: List[A]): Int = foldRight(l, 0)((e, acc) => acc + 1)
 
-  def foldLeft[A,B](l: List[A], z: B)(f: (B, A) => B): B = sys.error("todo")
+  @tailrec
+  def foldLeft[A,B](l: List[A], z: B)(f: (B, A) => B): B = l match {
+    case Nil => z
+    case Cons(h, t) => foldLeft(t, f(z, h))(f)
+  }
+  
+  def sum3(ns: List[Int]): Int = foldLeft(ns, 0)(_ + _)
+
+  def product3(ns: List[Int]): Int = foldLeft(ns, 1)(_ * _)
+  
+  def length3[A](ns: List[A]): Int = foldLeft(ns, 0)((x, _) => x + 1)
+  
+  def reverse[A](l: List[A]): List[A] = foldLeft(l, List[A]())((acc: List[A], x: A) => Cons(x, acc))
+  
+  def foldLeft2[A,B](l: List[A], z: B)(f: (B, A) => B): B = foldRight(reverse(l), z)((x,y) => f(y,x)) 
+  
+  def foldRight2[A,B](l: List[A], z: B)(f: (A, B) => B): B = foldLeft(reverse(l), z)((x,y) => f(y,x))
+  
+  def append2[A](a1: List[A], a2: List[A]): List[A] = foldRight2(a1, a2)(Cons(_,_))
+  
+  def flatten[A](l: List[List[A]]): List[A] = foldRight2(l, List[A]())(append2)
 
   def map[A,B](l: List[A])(f: A => B): List[B] = sys.error("todo")
 }
